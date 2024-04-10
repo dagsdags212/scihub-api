@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scihub"
+version = "0.0.1"
+
+[project.scripts]
+scihub = "scihub.__main__:main"]
