@@ -12,7 +12,10 @@ async def _get(url: str, client: httpx.Client, params: dict[str, str]={}) -> htt
     resp.raise_for_status()
     return resp
 
-async def fetch_article(doi: [str, list[str]], client: httpx.Client, verbose: bool=False) -> Article:
+async def fetch_article(
+        doi: [str, list[str]],
+        client: httpx.Client,
+        verbose: bool=False) -> list[Article]:
     """
     Uses an open TCP connection to send a request to Scihub in order to retrieve
     information on an article with the passed `doi`.
@@ -25,8 +28,6 @@ async def fetch_article(doi: [str, list[str]], client: httpx.Client, verbose: bo
     resp = await asyncio.gather(*[_get(url, client) for url in urls])
     parsers = [ArticleParser(r.text) for r in resp]
     articles = [p.parse() for p in parsers]
-    if len(articles) == 1:
-        return articles[0]
     return articles
 
 async def download_article(article: Article, path: Path=None) -> None:

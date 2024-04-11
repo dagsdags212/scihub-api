@@ -4,11 +4,14 @@ import sys
 def extract_doi(filepath: Path, verbose: bool=False) -> list[str]:
     """Extracts a series of DOIs from a text file."""
     dois = []
+    prefix = "https://doi.org/"
     try:
         with open(filepath, "r") as f:
             for line in f.readlines():
-                doi = line.strip()
-                dois.append(doi)
+                if line.startswith(prefix):
+                    line = line.replace(prefix, "")
+                else:
+                    dois.append(line.strip())
         f.close()
     except FileNotFoundError as err:
         print(err)
