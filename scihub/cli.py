@@ -6,7 +6,7 @@ arg_parser = argparse.ArgumentParser(
 )
 
 arg_parser.add_argument("-d", "--doi", type=str)
-arg_parser.add_argument("-i", "--input", type=str)
+arg_parser.add_argument("-f", "--file", type=str)
 arg_parser.add_argument("-o", "--outdir", type=str)
 arg_parser.add_argument("--citation", action="store_true")
 arg_parser.add_argument("--verbose", action="store_true")
