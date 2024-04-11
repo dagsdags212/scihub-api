@@ -15,7 +15,6 @@ def main() -> None:
         assert os.path.isfile(args.file), "Invalid input file"
         doi_list = extract_doi(args.file, verbose=args.verbose)
         articles = asyncio.run(fetch_article(doi_list, client=client))
-        print(f"Collection {len(articles)} articles.")
     else:
         # fetch a single article
         articles = asyncio.run(fetch_article(args.doi, client=client))
@@ -23,11 +22,12 @@ def main() -> None:
     if args.citation:
         # print out APA citation(s)
         for i, article in enumerate(articles):
-            print(f"{i+1}\t{article.citation}")
+            print(f"{i+1}\t{article.citation.raw}")
         sys.exit(0)
     elif args.outdir:
         # download file
         for i, article in enumerate(articles):
+            print(f"Downloading article {i+1} of {len(articles)}")
             asyncio.run(download_article(article, args.outdir))
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
+import re
 import sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 from scihub.classes.SelectorTree import SelectorTree
-from scihub.classes.Article import Article
+from scihub.classes.Article import Citation, Article
 from scihub.classes.CustomErrors import ArticleNotFoundError
 
 
@@ -53,8 +54,32 @@ class ArticleParser(HTMLParser):
         error = soup.select(tree["404"])
         if len(error) > 0:
             raise ArticleNotFoundError
-        citation = soup.select(tree["citation"])[0].text.strip()
+        citation_str = soup.select(tree["citation"])[0].text.strip()
         doi = soup.select(tree["doi"])[0].text.strip()
         download_url = soup.select(tree["download_path"])[0].get("src")
+        citation = self.parse_citation_from_string(citation_str)
 
         return Article(citation=citation, download_url=download_url, doi=doi)
+
+    @classmethod
+    def parse_citation_from_string(self, citation: str) -> Citation:
+        """Extracts all fields from an APA citation string."""
+        data = {"raw": citation}
+        # a dictionary for holding regex patterns
+        patterns = {
+            "title": r"(?<=\(\d{4}\)\.\s)[A-Z].*(?=\.\s[A-Z])", 
+            "publication_year": r"(?<=\()\d{4}(?=\))",
+            "journal": r"(?<=[a-z]\.\s)([A-Z]+[\w\s,\(\)-]*)",
+            "doi": r"doi:\d{2,4}\.\d{4}\/.*",
+            "authors": r"[A-Z][a-z]*,\s[A-Z].", 
+        }
+        for field, pattern in patterns.items():
+            if field == "authors":
+                data[field] = re.findall(pattern, citation)
+            else:
+                result = re.search(pattern, citation).group(0)
+                if field == "publication_year":
+                    result = int(result)
+                data[field] = result
+
+        return Citation(**data)

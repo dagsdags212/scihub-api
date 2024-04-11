@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Tuple
 
 class Author(BaseModel):
     """Contains fields for representing an author."""
@@ -13,17 +14,16 @@ class Author(BaseModel):
 
 class Citation(BaseModel):
     """Contains fields for citing an article."""
+    raw: str
     title: str
     publication_year: int
     journal: str
-    volume: int
-    issue: int
     doi: str
-    authors: list[Author]
+    authors: list[str]
 
 class Article(BaseModel):
     """Contains article metadata."""
-    citation: str
+    citation: Citation
     download_url: str
     doi: str
 
