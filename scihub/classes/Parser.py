@@ -1,11 +1,9 @@
 import re
-import sys
-from pathlib import Path
 from bs4 import BeautifulSoup
 from scihub.classes.SelectorTree import SelectorTree
 from scihub.classes.Article import Citation, Article
 from scihub.classes.CustomErrors import ArticleNotFoundError
-
+from scihub.cli import CLI_ARGS
 
 class HTMLParser:
     """
@@ -53,7 +51,8 @@ class ArticleParser(HTMLParser):
         tree = self.tree
         error = soup.select(tree["404"])
         if len(error) > 0:
-            raise ArticleNotFoundError
+            message = f"Article not found. (DOI: {CLI_ARGS.doi})"
+            raise ArticleNotFoundError(message)
         citation_str = soup.select(tree["citation"])[0].text.strip()
         doi = soup.select(tree["doi"])[0].text.strip()
         download_url = soup.select(tree["download_path"])[0].get("src")
@@ -62,7 +61,7 @@ class ArticleParser(HTMLParser):
         return Article(citation=citation, download_url=download_url, doi=doi)
 
     @classmethod
-    def parse_citation_from_string(self, citation: str) -> Citation:
+    def parse_citation_from_string(cls, citation: str) -> Citation:
         """Extracts all fields from an APA citation string."""
         data = {"raw": citation}
         # a dictionary for holding regex patterns
@@ -77,9 +76,14 @@ class ArticleParser(HTMLParser):
             if field == "authors":
                 data[field] = re.findall(pattern, citation)
             else:
-                result = re.search(pattern, citation).group(0)
-                if field == "publication_year":
-                    result = int(result)
-                data[field] = result
+                result = re.search(pattern, citation)
+                if result:
+                    result = result.group(0)
+                    if field == "publication_year":
+                        result = int(result)
+                    data[field] = result
+                else:
+                    print(f"The field `{field}` cannot be found.")
+                    continue
 
         return Citation(**data)
