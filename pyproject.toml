@@ -7,4 +7,4 @@ name = "scihub"
 version = "0.0.1"
 
 [project.scripts]
-scihub = "scihub.__main__:main"]
+scihub = "scihub.__main__:main"

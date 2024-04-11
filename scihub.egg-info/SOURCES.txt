@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+scihub/__init__.py
+scihub/__main__.py
+scihub.egg-info/PKG-INFO
+scihub.egg-info/SOURCES.txt
+scihub.egg-info/dependency_links.txt
+scihub.egg-info/entry_points.txt
+scihub.egg-info/top_level.txt
+scihub/classes/Client.py
+scihub/classes/Parser.py
+scihub/classes/SelectorTree.py
+scihub/classes/__init__.py
